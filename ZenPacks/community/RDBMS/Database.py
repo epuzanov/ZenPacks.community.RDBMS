@@ -1,7 +1,7 @@
 ################################################################################
 #
 # This program is part of the RDBMS Zenpack for Zenoss.
-# Copyright (C) 2009, 2010 Egor Puzanov.
+# Copyright (C) 2009, 2010, 2011 Egor Puzanov.
 #
 # This program can be used under the GNU General Public License version 2
 # You can find full information here: http://www.zenoss.com/oss
@@ -12,9 +12,9 @@ __doc__="""Database
 
 Database is a Database
 
-$Id: Database.py,v 1.4 2010/09/27 00:02:29 egor Exp $"""
+$Id: Database.py,v 1.5 2011/01/04 20:36:12 egor Exp $"""
 
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
@@ -133,7 +133,6 @@ class Database(ZenPackPersistence, OSComponent, HWStatus):
             dbsrvinst = inst
             break
         if dbsrvinst: self.dbsrvinstance.addRelation(dbsrvinst)
-        else: log.warn("DB Server Instance:%s not found", instname)
 
     security.declareProtected(ZEN_VIEW, 'getDBSrvInst')
     def getDBSrvInst(self):

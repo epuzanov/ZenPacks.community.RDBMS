@@ -37,7 +37,8 @@ ZC.DatabasePanel = Ext.extend(ZC.ComponentGridPanel, {
                 {name: 'usedBytesString'},
                 {name: 'capacity'},
                 {name: 'locking'},
-                {name: 'hasMonitor'},
+                {name: 'usesMonitorAttribute'},
+                {name: 'monitored'},
                 {name: 'monitor'}
             ],
             columns: [{
@@ -75,10 +76,9 @@ ZC.DatabasePanel = Ext.extend(ZC.ComponentGridPanel, {
                 header: _t('% Util'),
                 width: 50
             },{
-                id: 'monitor',
-                dataIndex: 'monitor',
+                id: 'monitored',
+                dataIndex: 'monitored',
                 header: _t('Monitored'),
-                renderer: Zenoss.render.monitor,
                 width: 60
             },{
                 id: 'status',
@@ -112,7 +112,8 @@ ZC.DBSrvInstPanel = Ext.extend(ZC.ComponentGridPanel, {
                 {name: 'manufacturer'},
                 {name: 'product'},
                 {name: 'locking'},
-                {name: 'hasMonitor'},
+                {name: 'usesMonitorAttribute'},
+                {name: 'monitored'},
                 {name: 'monitor'}
             ],
             columns: [{
@@ -137,10 +138,9 @@ ZC.DBSrvInstPanel = Ext.extend(ZC.ComponentGridPanel, {
                 header: _t('Product'),
                 renderer: render_link
             },{
-                id: 'monitor',
-                dataIndex: 'monitor',
+                id: 'monitored',
+                dataIndex: 'monitored',
                 header: _t('Monitored'),
-                renderer: Zenoss.render.monitor,
                 width: 60
             },{
                 id: 'status',
