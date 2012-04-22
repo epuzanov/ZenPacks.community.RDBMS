@@ -815,6 +815,56 @@ AVERAGE
 </object>
 </tomanycont>
 </object>
+<!-- ('', 'zport', 'dmd', 'Events', 'Status', 'DBSrvInst') -->
+<object id='/zport/dmd/Events/Status/DBSrvInst' module='Products.ZenEvents.EventClass' class='EventClass'>
+<property type="text" id="transform" mode="w" >
+for comp in device.os.softwaredbsrvinstances():
+    if comp.id != evt.component: continue
+    if comp.status == 0 and evt.severity != 0:
+        comp.status = 1
+        txnCommit()
+    elif comp.status != 0 and evt.severity == 0:
+        comp.status = 0
+        txnCommit()
+    break
+</property>
+<property type="text" id="transform" mode="w" >
+for comp in device.os.softwaredbsrvinstances():
+    if comp.id != evt.component: continue
+    if comp.status == 0 and evt.severity != 0:
+        comp.status = 1
+        txnCommit()
+    elif comp.status != 0 and evt.severity == 0:
+        comp.status = 0
+        txnCommit()
+    break
+</property>
+</object>
+<!-- ('', 'zport', 'dmd', 'Events', 'Status', 'Database') -->
+<object id='/zport/dmd/Events/Status/Database' module='Products.ZenEvents.EventClass' class='EventClass'>
+<property type="text" id="transform" mode="w" >
+for comp in device.os.softwaredatabases():
+    if comp.id != evt.component: continue
+    if comp.status == 2 and evt.severity != 0:
+        comp.status = 5
+        txnCommit()
+    elif comp.status != 2 and evt.severity == 0:
+        comp.status = 2
+        txnCommit()
+    break
+</property>
+<property type="text" id="transform" mode="w" >
+for comp in device.os.softwaredatabases():
+    if comp.id != evt.component: continue
+    if comp.status == 2 and evt.severity != 0:
+        comp.status = 5
+        txnCommit()
+    elif comp.status != 2 and evt.severity == 0:
+        comp.status = 2
+        txnCommit()
+    break
+</property>
+</object>
 <!-- ('', 'zport', 'dmd', 'Mibs', 'mibs', 'RDBMS-MIB') -->
 <object id='/zport/dmd/Mibs/mibs/RDBMS-MIB' module='Products.ZenModel.MibModule' class='MibModule'>
 <property type="string" id="language" mode="w" >

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configure xmlns:browser="http://namespaces.zope.org/browser">
+
+    <browser:resourceDirectory
+             name="rdbms"
+             directory="resources"
+             />
+
+    <browser:viewlet
+             name="js-rdbms"
+             paths="/++resource++rdbms/js/RDBMS.js"
+             weight="15"
+             manager="Products.ZenUI3.browser.interfaces.IJavaScriptSrcManager"
+             class="Products.ZenUI3.browser.javascript.JavaScriptSrcBundleViewlet"
+             permission="zope2.Public"
+             />
+</configure>

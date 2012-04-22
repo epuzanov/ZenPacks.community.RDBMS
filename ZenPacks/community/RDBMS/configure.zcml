@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configure xmlns="http://namespaces.zope.org/zope"
-           xmlns:browser="http://namespaces.zope.org/browser"
            xmlns:zcml="http://namespaces.zope.org/zcml">
 
     <configure zcml:condition="installed Products.Zuul">
+
+        <include package=".browser"/>
 
         <adapter factory=".info.rdbmsDatabaseInfo"
                  for=".Database.Database"
@@ -13,20 +14,6 @@
         <adapter factory=".info.rdbmsDBSrvInstInfo"
                  for=".DBSrvInst.DBSrvInst"
                  provides=".interfaces.IDBSrvInstInfo"
-                 />
-
-        <browser:resourceDirectory
-                 name="rdbms"
-                 directory="resources"
-                 />
-
-        <browser:viewlet
-                 name="js-rdbms"
-                 paths="/++resource++rdbms/RDBMS.js"
-                 weight="10"
-                 manager="Products.ZenUI3.browser.interfaces.IJavaScriptSrcManager"
-                 class="Products.ZenUI3.browser.javascript.JavaScriptSrcBundleViewlet"
-                 permission="zope2.Public"
                  />
     </configure>
 </configure>

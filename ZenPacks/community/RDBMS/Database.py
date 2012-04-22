@@ -1,7 +1,7 @@
 ################################################################################
 #
 # This program is part of the RDBMS Zenpack for Zenoss.
-# Copyright (C) 2009, 2010, 2011 Egor Puzanov.
+# Copyright (C) 2009-2012 Egor Puzanov.
 #
 # This program can be used under the GNU General Public License version 2
 # You can find full information here: http://www.zenoss.com/oss
@@ -12,13 +12,12 @@ __doc__="""Database
 
 Database is a Database
 
-$Id: Database.py,v 1.5 2011/01/04 20:36:12 egor Exp $"""
+$Id: Database.py,v 1.6 2012/03/31 22:08:51 egor Exp $"""
 
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from ZenPacks.community.deviceAdvDetail.HWStatus import *
 from Products.ZenModel.OSComponent import OSComponent
 from Products.ZenModel.ZenDate import ZenDate
 from Products.ZenModel.ZenPackPersistence import ZenPackPersistence
@@ -41,7 +40,7 @@ def manage_addDatabase(context, id, userCreated, REQUEST=None):
 
 addDatabase = DTMLFile('dtml/addDatabase',globals())
 
-class Database(ZenPackPersistence, OSComponent, HWStatus):
+class Database(ZenPackPersistence, OSComponent):
     """
     Database object
     """
@@ -59,13 +58,21 @@ class Database(ZenPackPersistence, OSComponent, HWStatus):
     activeTime = ""
     totalBlocks = 0L
     blockSize = 1L
-    status = 1
+    status = 2
 
-    statusmap ={1: (DOT_GREY, SEV_WARNING, 'Unknown'),
-                2: (DOT_GREEN, SEV_CLEAN, 'Active'),
-                3: (DOT_YELLOW, SEV_WARNING, 'Available'),
-                4: (DOT_ORANGE, SEV_ERROR, 'Restricted'),
-                5: (DOT_RED, SEV_CRITICAL, 'Unavailable'),
+    statusConversions = [
+                'Unknown:1',
+                'Active:2',
+                'Available:3',
+                'Restricted:4',
+                'Unavailable:5',
+                ]
+
+    statusmap ={1: ('grey', 3, 'Unknown'),
+                2: ('green', 0, 'Active'),
+                3: ('yellow', 3, 'Available'),
+                4: ('orange', 4, 'Restricted'),
+                5: ('red', 5, 'Unavailable'),
                 }
 
     _properties = OSComponent._properties + (
@@ -127,12 +134,10 @@ class Database(ZenPackPersistence, OSComponent, HWStatus):
         Set the dbsrvinstance relationship to the DB Server Instance specified
         by the given instance name.
         """
-        dbsrvinst = None
         for inst in self.os().softwaredbsrvinstances():
             if inst.dbsiname != instname: continue
-            dbsrvinst = inst
+            self.dbsrvinstance.addRelation(inst)
             break
-        if dbsrvinst: self.dbsrvinstance.addRelation(dbsrvinst)
 
     security.declareProtected(ZEN_VIEW, 'getDBSrvInst')
     def getDBSrvInst(self):
@@ -141,16 +146,15 @@ class Database(ZenPackPersistence, OSComponent, HWStatus):
 
     def getDBSrvInstLink(self):
         dbsi = self.dbsrvinstance()
-        if dbsi: return dbsi.urlLink(text=str(dbsi.dbsiname),
-                                    attrs={'target':'_top'})
-        else: return ""
+        return dbsi and dbsi.urlLink(text=str(dbsi.dbsiname),
+                                    attrs={'target':'_top'}) or ""
 
     def dbSrvInstName(self):
         """
         Return the Database Server Instance Name
         """
         dbsi = self.dbsrvinstance()
-        return dbsi and dbsi.dbsiname or ''
+        return dbsi and dbsi.dbsiname or ""
 
     def totalBytes(self):
         """
@@ -191,7 +195,7 @@ class Database(ZenPackPersistence, OSComponent, HWStatus):
         Return the Available bytes in human readable form ie 10MB
         """
         sa = long(self.totalBytes()) - long(self.usedBytes())
-        if 0 > sa: sa = 0 
+        if sa < 0: sa = 0 
         return convToUnits(sa)
 
     def capacity(self):
@@ -216,17 +220,59 @@ class Database(ZenPackPersistence, OSComponent, HWStatus):
         Return the name of a Database
         """
         return self.dbname
-    name = viewName
+
+    security.declareProtected(ZEN_CHANGE_DEVICE, 'convertStatus')
+    def convertStatus(self, status):
+        """
+        Convert status to the status string
+        """
+        return self.statusmap.get(status, ('grey', 3, 'Other'))[2]
+
+    security.declareProtected(ZEN_CHANGE_DEVICE, 'getStatus')
+    def getStatus(self, statClass=None):
+        """
+        Return the status number for this component of class statClass.
+        """
+        if not self.monitored() \
+            or not self.device() \
+            or not self.device().monitorDevice(): return 0
+        return self.status
+
+    def getStatusImgSrc(self, status=None):
+        """
+        Return the img source for a status number
+        """
+        if status is None: status = self.getStatus()
+        src = self.statusmap.get(status, ('grey', 3, 'Other'))[0]
+        return '/zport/dmd/img/%s_dot.png' % src
+
+    def statusDot(self, status=None):
+        """
+        Return the img source for a status number
+        Return the Dot Color based on maximal severity
+        """
+        if status is None:
+            status = self.getStatus()
+        return self.statusmap.get(status, ('grey', 3, 'Other'))[0]
+
+    def statusString(self, status=None):
+        """
+        Return the status string
+        """
+        if status is None:
+            status = self.getStatus()
+        return self.getStatusString(status)
 
     def getRRDTemplates(self):
         """
         Return the RRD Templates list
         """
-        templates = []
-        for tname in [self.__class__.__name__]:
-            templ = self.getRRDTemplateByName(tname)
-            if templ: templates.append(templ)
-        return templates
+        for tmplName in (self.__class__.__name__, self.meta_type):
+            template = self.getRRDTemplateByName(tmplName)
+            if template is not None: break
+        else:
+            return []
+        return [template]
 
     def manage_editDatabase(self, monitor=False,
                 dbname=None, type=None, blockSizes=None, 
@@ -250,6 +296,5 @@ class Database(ZenPackPersistence, OSComponent, HWStatus):
                 'Database %s was updated.' % dbname
             )
             return self.callZenScreen(REQUEST)
-
 
 InitializeClass(Database)

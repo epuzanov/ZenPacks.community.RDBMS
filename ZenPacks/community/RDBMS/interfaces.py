@@ -1,7 +1,7 @@
 ################################################################################
 #
 # This program is part of the RDBMS Zenpack for Zenoss.
-# Copyright (C) 2009, 2010 Egor Puzanov.
+# Copyright (C) 2009-2012 Egor Puzanov.
 #
 # This program can be used under the GNU General Public License version 2
 # You can find full information here: http://www.zenoss.com/oss
@@ -12,9 +12,9 @@ __doc__="""interfaces
 
 describes the form field to the user interface.
 
-$Id: interfaces.py,v 1.3 2010/09/27 00:05:28 egor Exp $"""
+$Id: interfaces.py,v 1.4 2012/04/19 22:42:22 egor Exp $"""
 
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 from Products.Zuul.interfaces import IComponentInfo
 from Products.Zuul.form import schema
@@ -44,4 +44,4 @@ class IDBSrvInstInfo(IComponentInfo):
     contact = schema.Text(title=u"Contact", readonly=True, group='Details')
     manufacturer = schema.Entity(title=u"Manufacturer", readonly=True,
                                 group='Details')
-    product = schema.Entity(title=u"Model", readonly=True, group='Details')
+    product = schema.Entity(title=u"Product", readonly=True, group='Details')

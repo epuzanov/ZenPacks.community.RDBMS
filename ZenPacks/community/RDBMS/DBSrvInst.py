@@ -1,7 +1,7 @@
 ################################################################################
 #
 # This program is part of the RDBMS Zenpack for Zenoss.
-# Copyright (C) 2009, 2010 Egor Puzanov.
+# Copyright (C) 2009-2012 Egor Puzanov.
 #
 # This program can be used under the GNU General Public License version 2
 # You can find full information here: http://www.zenoss.com/oss
@@ -12,13 +12,12 @@ __doc__="""DBSrvInst
 
 DBSrvInst is a DBSrvInst
 
-$Id: DBSrvInst.py,v 1.3 2010/11/20 15:52:19 egor Exp $"""
+$Id: DBSrvInst.py,v 1.4 2012/03/31 22:09:16 egor Exp $"""
 
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
-from ZenPacks.community.deviceAdvDetail.HWStatus import *
 from Products.ZenModel.ZenPackPersistence import ZenPackPersistence
 from Products.ZenModel.ZenossSecurity import *
 from Products.ZenUtils.Utils import prepId
@@ -41,7 +40,7 @@ def manage_addDBSrvInst(context, id, userCreated, REQUEST=None):
 
 addDBSrvInst = DTMLFile('dtml/addDBSrvInst',globals())
 
-class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
+class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct):
     """
     DBSrvInst object
     """
@@ -60,8 +59,13 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
     monitorProc = False
     status = 0
 
-    statusmap ={0: (DOT_GREEN, SEV_CLEAN, 'Up'),
-                1: (DOT_RED, SEV_CRITICAL, 'Down'),
+    statusConversions = [
+                'Up:0',
+                'Down:1',
+                ]
+
+    statusmap ={0: ('green', 0, 'Up'),
+                1: ('red', 5, 'Down'),
                 }
 
     _properties = (
@@ -74,12 +78,10 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         {'id':'status', 'type':'int', 'mode':'w'},
         )
 
-
     _relations = MEProduct._relations + (
         ("os", ToOne(ToManyCont, "Products.ZenModel.OperatingSystem", "softwaredbsrvinstances")),
         ("databases", ToMany(ToOne, "ZenPacks.community.RDBMS.Database", "dbsrvinstance")),
         )
-
 
     factory_type_information = (
         {
@@ -124,10 +126,8 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
 
     security = ClassSecurityInfo()
 
-
     def __init__(self, id, title=""):
         MEProduct.__init__(self, id, title)
-
 
     security.declareProtected('Change Device', 'setProduct')
     def setProduct(self, productName,  manufacturer="Unknown", 
@@ -147,7 +147,6 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
             )
             return self.callZenScreen(REQUEST)
 
-
     def setProductKey(self, prodKey, manufacturer=None):
         """Set the product class of this software by its productKey.
         """
@@ -165,14 +164,12 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         else:
             self.productClass.removeRelation()
 
-
     def name(self):
         """Return the name of this software (from its softwareClass)
         """
         pclass = self.productClass()
         if pclass: return pclass.name
         return ""
-
 
     def version(self):
         """Return the version of this software (from its softwareClass)
@@ -181,14 +178,12 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         if pclass: return pclass.version
         return ""
 
-
     def build(self):
         """Return the build of this software (from its softwareClass)
         """
         pclass = self.productClass()
         if pclass: return pclass.build
         return ""
-
 
     def setUserCreateFlag(self):
         """
@@ -197,13 +192,11 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         """
         self.isUserCreatedFlag = True
 
-
     def isUserCreated(self):
         """
         Returns the value of isUserCreated.  See setUserCreatedFlag() above.
         """
         return self.isUserCreatedFlag
-
 
     def device(self):
         """
@@ -211,7 +204,6 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         """
         os = self.os()
         if os: return os.device()
-
 
     def manage_deleteComponent(self, REQUEST=None):
         """
@@ -234,7 +226,6 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect(url)
 
-
     def manage_updateComponent(self, datamap, REQUEST=None):
         """
         Update OSComponent
@@ -256,7 +247,6 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         if REQUEST is not None:
             REQUEST['RESPONSE'].redirect(url)
 
-
     def getPrettyLink(self):
         """
         Gets a link to this object, plus an icon
@@ -277,14 +267,56 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
         return self.dbsiname
     name = viewName
 
+    security.declareProtected(ZEN_CHANGE_DEVICE, 'convertStatus')
+    def convertStatus(self, status):
+        """
+        Convert status to the status string
+        """
+        return self.statusmap.get(status, ('grey', 3, 'Other'))[2]
+
+    security.declareProtected(ZEN_CHANGE_DEVICE, 'getStatus')
+    def getStatus(self, statClass=None):
+        """
+        Return the status number for this component of class statClass.
+        """
+        if not self.monitored() \
+            or not self.device() \
+            or not self.device().monitorDevice(): return 0
+        return self.status
+
+    def getStatusImgSrc(self, status=None):
+        """
+        Return the img source for a status number
+        """
+        if status is None: status = self.getStatus()
+        src = self.statusmap.get(status, ('grey', 3, 'Other'))[0]
+        return '/zport/dmd/img/%s_dot.png' % src
+
+    def statusDot(self, status=None):
+        """
+        Return the img source for a status number
+        Return the Dot Color based on maximal severity
+        """
+        if status is None: status = self.getStatus()
+        return self.statusmap.get(status, ('grey', 3, 'Other'))[0]
+
+    def statusString(self, status=None):
+        """
+        Return the status string
+        """
+        if status is None: status = self.getStatus()
+        return self.getStatusString(status)
+
     def getRRDTemplates(self):
         """
         Return the RRD Templates list
         """
         templates = []
-        for tname in [self.__class__.__name__]:
-            templ = self.getRRDTemplateByName(tname)
-            if templ: templates.append(templ)
+        for tmplName in (self.__class__.__name__, self.meta_type):
+            template = self.getRRDTemplateByName(tmplName)
+            if template is None: continue
+            templates.append(template)
+            break
         return templates
 
     def manage_editDBSrvInst(self, monitor=False, dbsiname=None, REQUEST=None):
@@ -304,6 +336,5 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct, HWStatus):
                 'DB Server Instance %s was updated.' % dbsiname
             )
             return self.callZenScreen(REQUEST)
-
 
 InitializeClass(DBSrvInst)
