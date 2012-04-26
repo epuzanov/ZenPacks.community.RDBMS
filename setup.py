@@ -8,7 +8,7 @@ AUTHOR = "Egor Puzanov"
 LICENSE = ""
 NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.community']
 PACKAGES = ['ZenPacks', 'ZenPacks.community', 'ZenPacks.community.RDBMS']
-INSTALL_REQUIRES = ['ZenPacks.community.deviceAdvDetail>=2.0']
+INSTALL_REQUIRES = []
 COMPAT_ZENOSS_VERS = ">=2.5"
 PREV_ZENPACK_NAME = ""
 # STOP_REPLACEMENTS
