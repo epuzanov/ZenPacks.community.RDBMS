@@ -815,6 +815,9 @@ AVERAGE
 </object>
 </tomanycont>
 </object>
+<!-- ('', 'zport', 'dmd', 'Events', 'Perf', 'DB') -->
+<object id='/zport/dmd/Events/Perf/DB' module='Products.ZenEvents.EventClass' class='EventClass'>
+</object>
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'DBSrvInst') -->
 <object id='/zport/dmd/Events/Status/DBSrvInst' module='Products.ZenEvents.EventClass' class='EventClass'>
 <property type="text" id="transform" mode="w" >
