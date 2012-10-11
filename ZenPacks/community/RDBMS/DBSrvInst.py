@@ -12,9 +12,9 @@ __doc__="""DBSrvInst
 
 DBSrvInst is a DBSrvInst
 
-$Id: DBSrvInst.py,v 1.4 2012/03/31 22:09:16 egor Exp $"""
+$Id: DBSrvInst.py,v 1.5 2012/10/11 19:01:46 egor Exp $"""
 
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 from Globals import InitializeClass, DTMLFile
 from AccessControl import ClassSecurityInfo
@@ -163,6 +163,12 @@ class DBSrvInst(ZenPackPersistence, DeviceComponent, MEProduct):
             self.productClass.addRelation(prodobj)
         else:
             self.productClass.removeRelation()
+
+    def dbSrvInstName(self):
+        """
+        Return the Database Server Instance Name
+        """
+        return self.dbsiname
 
     def name(self):
         """Return the name of this software (from its softwareClass)
