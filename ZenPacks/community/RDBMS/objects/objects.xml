@@ -821,7 +821,6 @@ AVERAGE
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'DBSrvInst') -->
 <object id='/zport/dmd/Events/Status/DBSrvInst' module='Products.ZenEvents.EventClass' class='EventClass'>
 <property type="text" id="transform" mode="w" >
-status = evt.severity and 1 or 0
 try: comp = component
 except NameError:
     from ZODB.transact import transact
@@ -830,6 +829,7 @@ except NameError:
     else:
         comp = None
 if comp is not None:
+    status = evt.severity and 1 or 0
     if comp.status == status:
         evt._action = 'drop'
     else:
@@ -839,7 +839,6 @@ if comp is not None:
         updateDb()
 </property>
 <property type="text" id="transform" mode="w" >
-status = evt.severity and 1 or 0
 try: comp = component
 except NameError:
     from ZODB.transact import transact
@@ -848,6 +847,7 @@ except NameError:
     else:
         comp = None
 if comp is not None:
+    status = evt.severity and 1 or 0
     if comp.status == status:
         evt._action = 'drop'
     else:
@@ -860,7 +860,6 @@ if comp is not None:
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'Database') -->
 <object id='/zport/dmd/Events/Status/Database' module='Products.ZenEvents.EventClass' class='EventClass'>
 <property type="text" id="transform" mode="w" >
-status = evt.severity and 5 or 2
 try: comp = component
 except NameError:
     from ZODB.transact import transact
@@ -869,6 +868,7 @@ except NameError:
     else:
         comp = None
 if comp is not None:
+    status = evt.severity and 5 or 2
     if comp.status == status:
         evt._action = 'drop'
     else:
@@ -878,7 +878,6 @@ if comp is not None:
         updateDb()
 </property>
 <property type="text" id="transform" mode="w" >
-status = evt.severity and 5 or 2
 try: comp = component
 except NameError:
     from ZODB.transact import transact
@@ -887,6 +886,7 @@ except NameError:
     else:
         comp = None
 if comp is not None:
+    status = evt.severity and 5 or 2
     if comp.status == status:
         evt._action = 'drop'
     else:
