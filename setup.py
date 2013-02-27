@@ -5,7 +5,7 @@
 NAME = "ZenPacks.community.RDBMS"
 VERSION = "2.5"
 AUTHOR = "Egor Puzanov"
-LICENSE = ""
+LICENSE = "GPLv2"
 NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.community']
 PACKAGES = ['ZenPacks', 'ZenPacks.community', 'ZenPacks.community.RDBMS']
 INSTALL_REQUIRES = []
