@@ -821,7 +821,7 @@ AVERAGE
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'DBSrvInst') -->
 <object id='/zport/dmd/Events/Status/DBSrvInst' module='Products.ZenEvents.EventClass' class='EventClass'>
 <property type="text" id="transform" mode="w" >
-status = evt.severity > 0 and 1 or 0
+status = evt.severity and 1 or 0
 try: comp = component
 except NameError:
     from ZODB.transact import transact
@@ -839,7 +839,7 @@ if comp is not None:
         updateDb()
 </property>
 <property type="text" id="transform" mode="w" >
-status = evt.severity > 0 and 1 or 0
+status = evt.severity and 1 or 0
 try: comp = component
 except NameError:
     from ZODB.transact import transact
@@ -860,7 +860,7 @@ if comp is not None:
 <!-- ('', 'zport', 'dmd', 'Events', 'Status', 'Database') -->
 <object id='/zport/dmd/Events/Status/Database' module='Products.ZenEvents.EventClass' class='EventClass'>
 <property type="text" id="transform" mode="w" >
-status = evt.severity > 0 and 5 or 2
+status = evt.severity and 5 or 2
 try: comp = component
 except NameError:
     from ZODB.transact import transact
@@ -878,7 +878,7 @@ if comp is not None:
         updateDb()
 </property>
 <property type="text" id="transform" mode="w" >
-status = evt.severity > 0 and 5 or 2
+status = evt.severity and 5 or 2
 try: comp = component
 except NameError:
     from ZODB.transact import transact
