@@ -39,7 +39,7 @@ user.
 
     ::
 
-        zenpack --install ZenPacks.community.RDBMS-2.5.egg
+        zenpack --install ZenPacks.community.RDBMS-2.5.0.egg
         zenoss restart
 
 Developer Installation (link mode)
